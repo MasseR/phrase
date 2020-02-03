@@ -2,35 +2,34 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Diceware where
 
-import           GHC.Natural
+import GHC.Natural
 
-import           Data.Text                 (Text)
+import           Data.Text            (Text)
 
-import           Data.Attoparsec.Text
+import           Data.Attoparsec.Text (Parser, char, many1, takeText)
 
-import           Control.Monad.State
-import           Control.Monad.Trans.Maybe
-import           Data.Foldable             (asum)
+import           Data.Foldable        (asum)
 
-import           Text.Read                 (readMaybe)
+import           Data.Map             (Map)
+import qualified Data.Map.Strict      as M
 
-import           Data.Map                  (Map)
-import qualified Data.Map.Strict           as M
-
-newtype Dice = Dice Int
+newtype Dice = Dice Natural
   deriving (Show, Eq, Ord, Num)
+
+dice :: Integral a => a -> Dice
+dice n = Dice ((fromIntegral n `mod` 6) + 1)
 
 data Dices = Dices !Dice !Dice !Dice !Dice !Dice
            deriving (Show, Eq, Ord)
 
-newtype Dict a = Dict (Map Dices a)
+newtype Diceware a = Diceware (Map Dices a)
 
-lookup :: Dices -> Dict a -> Maybe a
-lookup d (Dict m) = M.lookup d m
+lookup :: Dices -> Diceware a -> Maybe a
+lookup d (Diceware m) = M.lookup d m
 
 -- Suitable for folding
-insert :: (Dices, a) -> Dict a -> Dict a
-insert (k,v) (Dict m) = Dict (M.insert k v m)
+insert :: (Dices, a) -> Diceware a -> Diceware a
+insert (k,v) (Diceware m) = Diceware (M.insert k v m)
 
 parseDice :: Parser Dices
 parseDice =

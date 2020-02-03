@@ -1,6 +1,6 @@
-{ mkDerivation, base, conduit, conduit-extra, containers
-, cryptonite, hspec, mtl, optparse-applicative, stdenv, text
-, transformers
+{ mkDerivation, attoparsec, base, conduit, conduit-extra
+, containers, cryptonite, hspec, lens, mtl, optparse-applicative
+, stdenv, text, transformers
 }:
 mkDerivation {
   pname = "phrase";
@@ -9,10 +9,10 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    base conduit conduit-extra containers cryptonite mtl text
-    transformers
+    attoparsec base conduit conduit-extra containers cryptonite lens
+    mtl text transformers
   ];
   executableHaskellDepends = [ base mtl optparse-applicative text ];
-  testHaskellDepends = [ base hspec ];
+  testHaskellDepends = [ attoparsec base hspec ];
   license = stdenv.lib.licenses.bsd3;
 }
