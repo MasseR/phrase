@@ -2,11 +2,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Diceware where
 
-import GHC.Natural
+import           GHC.Natural
 
 import           Data.Text            (Text)
 
-import           Data.Attoparsec.Text (Parser, char, many1, takeText)
+import           Data.Attoparsec.Text (Parser, char, many1, parseOnly, takeText)
 
 import           Data.Foldable        (asum)
 
@@ -23,6 +23,7 @@ data Dices = Dices !Dice !Dice !Dice !Dice !Dice
            deriving (Show, Eq, Ord)
 
 newtype Diceware a = Diceware (Map Dices a)
+  deriving Show
 
 lookup :: Dices -> Diceware a -> Maybe a
 lookup d (Diceware m) = M.lookup d m
@@ -30,6 +31,9 @@ lookup d (Diceware m) = M.lookup d m
 -- Suitable for folding
 insert :: (Dices, a) -> Diceware a -> Diceware a
 insert (k,v) (Diceware m) = Diceware (M.insert k v m)
+
+empty :: Diceware a
+empty = Diceware M.empty
 
 parseDice :: Parser Dices
 parseDice =
@@ -54,3 +58,5 @@ parseDiceware = do
   t <- takeText
   return (d,t)
 
+parseLine :: Text -> Either String (Dices, Text)
+parseLine = parseOnly parseDiceware
