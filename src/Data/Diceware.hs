@@ -1,5 +1,5 @@
-{-# Language GeneralizedNewtypeDeriving #-}
-{-# Language ApplicativeDo #-}
+{-# LANGUAGE ApplicativeDo              #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Diceware where
 
 import           GHC.Natural
@@ -10,7 +10,7 @@ import           Data.Attoparsec.Text
 
 import           Control.Monad.State
 import           Control.Monad.Trans.Maybe
-import Data.Foldable (asum)
+import           Data.Foldable             (asum)
 
 import           Text.Read                 (readMaybe)
 
@@ -25,6 +25,12 @@ data Dices = Dices !Dice !Dice !Dice !Dice !Dice
 
 newtype Dict a = Dict (Map Dices a)
 
+lookup :: Dices -> Dict a -> Maybe a
+lookup d (Dict m) = M.lookup d m
+
+-- Suitable for folding
+insert :: (Dices, a) -> Dict a -> Dict a
+insert (k,v) (Dict m) = Dict (M.insert k v m)
 
 parseDice :: Parser Dices
 parseDice =
@@ -48,3 +54,4 @@ parseDiceware = do
   _ <- many1 (char ' ')
   t <- takeText
   return (d,t)
+
