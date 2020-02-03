@@ -1,4 +1,4 @@
-name: "Test"
+name: "Run nix build"
 on:
   pull_request:
   push:
@@ -9,6 +9,6 @@ jobs:
     - uses: actions/checkout@v1
     - uses: cachix/install-nix-action@v6
     - run: nix build -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/nixos-${{ matrix.env }} 'import <nixpkgs> {}).haskellPackages.callPackage ./. {}'
-strategy:
-  matrix:
-    env: [19.09, unstable]
+    strategy:
+      matrix:
+        env: [19.09, unstable]
