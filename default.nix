@@ -14,7 +14,8 @@ mkDerivation {
     cryptonite lens mtl text transformers
   ];
   executableHaskellDepends = [
-    base conduit conduit-extra mtl optparse-applicative resourcet text
+    base conduit conduit-extra cryptonite mtl optparse-applicative
+    resourcet text
   ];
   testHaskellDepends = [ attoparsec base hspec ];
   license = stdenv.lib.licenses.bsd3;
