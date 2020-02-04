@@ -21,6 +21,7 @@ library
   exposed-modules:     Data.Diceware
                      , Control.Monad.Diceware
                      , Control.Monad.GnuPG
+                     , Control.Phrase
   build-depends:       base ^>=4.12.0.0
                      , mtl
                      , text
@@ -33,6 +34,7 @@ library
                      , lens
                      , bytestring
                      , unliftio-core
+                     , directory
   hs-source-dirs:      src
 
 test-suite test
