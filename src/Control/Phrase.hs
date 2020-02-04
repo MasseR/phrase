@@ -1,21 +1,26 @@
 module Control.Phrase where
 
--- import qualified Control.Monad.Diceware  as DW
-import qualified Control.Monad.GnuPG     as GPG
+import qualified Control.Monad.Diceware   as DW
+import qualified Control.Monad.GnuPG      as GPG
 
-import           Control.Monad.Except    (runExceptT, throwError)
-import           Control.Monad.IO.Unlift (MonadUnliftIO)
-import           Control.Monad.Reader    (MonadReader)
-import           Control.Monad.Trans     (liftIO, lift)
+import           Control.Monad.Except     (ExceptT (..), runExceptT, throwError)
+import           Control.Monad.IO.Unlift  (MonadUnliftIO)
+import           Control.Monad.Reader     (MonadReader)
+import           Control.Monad.Trans      (lift, liftIO)
 
-import           Control.Lens            (view)
+import           Crypto.Random            (MonadRandom)
 
-import           System.Directory        (doesFileExist, renameFile)
+import           Control.Lens             (re, view)
+import           Data.Text.Strict.Lens    (utf8)
 
-import           Data.ByteString         (ByteString)
+import           System.Directory         (doesFileExist, renameFile)
 
-import Conduit (runConduit, yield, (.|), runResourceT)
-import Data.Conduit.Combinators (sinkSystemTempFile)
+import           Data.ByteString          (ByteString)
+import           Data.Text                (Text)
+
+import           Conduit                  (runConduit, runResourceT, yield,
+                                           (.|))
+import           Data.Conduit.Combinators (sinkSystemTempFile)
 
 data FileExists = FileExists
 
@@ -33,3 +38,13 @@ encryptFile path content = runExceptT $ do
       encrypted <- GPG.encrypt r content
       f <- runResourceT (runConduit (yield encrypted .| sinkSystemTempFile "phrase"))
       liftIO (renameFile f path)
+
+generate
+  :: (MonadUnliftIO m, MonadRandom m, MonadReader r m, GPG.HasRecipient r, DW.HasDiceware r)
+  => Int
+  -> FilePath
+  -> m (Either FileExists Text)
+generate n path = runExceptT $ do
+  sentence <- lift (DW.randomSentence n)
+  ExceptT (encryptFile path (view (re utf8) sentence))
+  pure sentence
