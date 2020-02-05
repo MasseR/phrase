@@ -34,7 +34,7 @@ class HasRecipient a where
 _Recipient :: Iso' Recipient String
 _Recipient = iso (\(Recipient r) -> r) Recipient
 
-data GPGError = GPGError ExitCode
+newtype GPGError = GPGError ExitCode
               deriving Show
 
 instance Exception GPGError
