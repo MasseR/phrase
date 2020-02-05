@@ -15,6 +15,7 @@ import           Data.Conduit.Combinators (decodeUtf8, sourceFile)
 import qualified Data.Conduit.Combinators as C
 import qualified Data.Conduit.Text        as Conduit.Text
 
+import           Data.Char                (isAlphaNum)
 import           Data.Text                (Text)
 
 import           Data.Generics.Product    (typed)
@@ -43,7 +44,7 @@ withEnv
   -> IO a
 withEnv dictFile storePath f = do
   dw <- runResourceT (runConduit (readUtf8 dictFile .| toDict))
-  r <- readFile (storePath </> ".gpg-id")
+  r <- filter isAlphaNum <$> readFile (storePath </> ".gpg-id")
   let env = Env dw (Recipient r) (Store storePath)
   f env
   where

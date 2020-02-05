@@ -13,7 +13,7 @@ mkDerivation {
   libraryHaskellDepends = [
     attoparsec base bytestring conduit conduit-extra containers
     cryptonite directory filepath generic-lens lens mtl text
-    transformers unliftio-core
+    transformers unliftio unliftio-core
   ];
   executableHaskellDepends = [
     base conduit conduit-extra cryptonite directory filepath mtl
