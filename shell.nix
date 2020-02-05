@@ -12,6 +12,7 @@ stdenv.mkDerivation {
   buildInputs = [
     entr
     haskellPackages.cabal-install
+    haskellPackages.hlint
     ghcid
     (haskellPackages.ghcWithHoogle (_: phrase.buildInputs ++ phrase.propagatedBuildInputs))
   ];

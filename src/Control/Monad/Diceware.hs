@@ -13,7 +13,6 @@ import           Crypto.Random             (MonadRandom, getRandomBytes)
 
 import           Data.Conduit              (runConduit, (.|))
 import qualified Data.Conduit.Combinators  as C
-import qualified Data.Conduit.Text         as Conduit.Text
 
 import qualified Data.ByteString           as B
 import           Data.Text                 (Text)
