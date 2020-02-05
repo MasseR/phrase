@@ -1,33 +1,32 @@
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DerivingStrategies         #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE NamedFieldPuns          #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 module Main where
 
-import           Data.Text                (Text)
-import qualified Data.Text.IO as T
+import           Data.Text           (Text)
+import qualified Data.Text.IO        as T
 
 import           Options.Applicative
 
-import           Paths_phrase             (getDataFileName)
+import           Paths_phrase        (getDataFileName)
 
-import           Data.Diceware            (Diceware)
-import qualified Data.Diceware            as DW
+import           Data.Environment    (withEnv)
 
-import           Control.Monad.Diceware
-import           Control.Monad.Reader     (MonadReader, ReaderT, runReaderT)
+import           Control.Monad.App   (runAppM)
+import           Control.Phrase      as Phrase
 
-import           Data.Maybe               (catMaybes)
+import           System.Directory    (getHomeDirectory)
+import           System.Environment  (lookupEnv)
+import           System.FilePath     ((</>))
 
-import           Control.Monad            (replicateM)
-import           Control.Monad.Trans      (MonadIO, lift)
-import           Crypto.Random            (MonadRandom (..))
+import           Data.Maybe          (fromMaybe)
 
-import           Conduit                  (runResourceT)
-import           Data.Conduit             (runConduit, (.|))
-import           Data.Conduit.Combinators (decodeUtf8, sourceFile)
-import qualified Data.Conduit.Combinators as C
-import           Data.Conduit.List        (unfoldM)
-import qualified Data.Conduit.Text        as Conduit.Text
+import           Control.Monad.Trans (liftIO)
+
 
 
 data Args
@@ -43,27 +42,19 @@ parseArgs =
   where
     parseName :: Parser Text
     parseName = argument str (metavar "pass-name" <> help "Name of the secret")
-    -- Not implemented yet
-    -- parseName = pure ""
     parseLength :: Parser Int
     parseLength = argument auto (metavar "pass-size" <> help "Sentence size" <> value 3 <> showDefault)
 
-newtype AppM a = AppM (ReaderT (Diceware Text) IO a)
-  deriving (Functor, Applicative, Monad, MonadReader (Diceware Text), MonadIO)
-
-instance MonadRandom AppM where
-  getRandomBytes = AppM . lift . getRandomBytes
-
-runAppM :: AppM a -> Diceware Text -> IO a
-runAppM (AppM f) = runReaderT f
-
 main :: IO ()
 main = do
-  Args{argsLength} <- execParser opts
+  Args{..} <- execParser opts
+  home <- getHomeDirectory
+  storeDir <- fromMaybe (home </> ".password-store") <$> lookupEnv "PASSWORD_STORE_DIR"
   source <- getDataFileName "data/words"
-  dw <- runResourceT (runConduit (readUtf8 source .| C.concatMap DW.parseLine .| C.foldl (flip DW.insert) DW.empty))
-  runAppM (randomSentence argsLength) dw >>= T.putStrLn
+  withEnv source storeDir $ \env ->
+    runAppM env $ do
+      s <- Phrase.generateForName argsLength argsName
+      liftIO (either (const (T.putStrLn "File already exists")) T.putStrLn s)
   where
-    readUtf8 source = sourceFile source .| decodeUtf8 .| Conduit.Text.lines
     opts :: ParserInfo Args
     opts = info (parseArgs <**> helper) fullDesc

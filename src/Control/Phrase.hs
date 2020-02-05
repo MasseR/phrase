@@ -2,6 +2,7 @@ module Control.Phrase where
 
 import qualified Control.Monad.Diceware   as DW
 import qualified Control.Monad.GnuPG      as GPG
+import Data.Store
 
 import           Control.Monad.Except     (ExceptT (..), runExceptT, throwError)
 import           Control.Monad.IO.Unlift  (MonadUnliftIO)
@@ -48,3 +49,12 @@ generate n path = runExceptT $ do
   sentence <- lift (DW.randomSentence n)
   ExceptT (encryptFile path (view (re utf8) sentence))
   pure sentence
+
+generateForName
+  :: (MonadUnliftIO m, MonadRandom m, MonadReader r m, GPG.HasRecipient r, DW.HasDiceware r, HasStore r)
+  => Int
+  -> Text
+  -> m (Either FileExists Text)
+generateForName n name = do
+  s <- view store
+  generate n (pathForName s name)
