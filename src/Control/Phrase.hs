@@ -40,7 +40,6 @@ encryptFile path content = runExceptT $ do
   where
     encryptAndWrite r = do
       encrypted <- GPG.encrypt r (content <> "\n")
-      liftIO $ print encrypted
       runResourceT $ do
         liftIO (createDirectoryIfMissing True (takeDirectory path))
         runConduit (yield encrypted .| sinkFile path)
