@@ -25,7 +25,7 @@ library
                      , Control.Phrase
                      , Data.Environment
                      , Data.Store
-  build-depends:       base ^>=4.12.0.0
+  build-depends:       base >= 4.12 && <5
                      , mtl
                      , text
                      , conduit
@@ -48,7 +48,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   main-is:             test.hs
   hs-source-dirs:      test
-  build-depends:       base ^>=4.12.0.0
+  build-depends:       base >= 4.12 && <5
                      , hspec
                      , phrase
                      , attoparsec
