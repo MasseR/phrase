@@ -58,7 +58,7 @@ executable phrase
   main-is:             Main.hs
   other-modules:       Paths_phrase
   -- other-extensions:
-  build-depends:       base ^>=4.12.0.0
+  build-depends:       base >= 4.12 && <5
                      , optparse-applicative
                      , mtl
                      , text
