@@ -7,8 +7,7 @@ let
 
 in
 
-stdenv.mkDerivation {
-  name = "shell";
+mkShell {
   buildInputs = [
     entr
     haskellPackages.cabal-install
