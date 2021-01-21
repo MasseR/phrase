@@ -12,6 +12,7 @@ mkShell {
     entr
     haskellPackages.cabal-install
     haskellPackages.hlint
+    stylish-haskell
     ghcid
     (haskellPackages.ghcWithHoogle (_: phrase.buildInputs ++ phrase.propagatedBuildInputs))
   ];
