@@ -29,7 +29,7 @@ library
                      , Control.Phrase
                      , Data.Environment
                      , Data.Store
-  build-depends:       
+  build-depends:
                      , mtl
                      , text
                      , conduit
