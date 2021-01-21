@@ -3,7 +3,6 @@ module Data.Environment where
 
 import           Control.Monad.Diceware   (HasDiceware (..))
 import           Control.Monad.GnuPG      (HasRecipient (..), Recipient (..))
-import           Data.Diceware            (Diceware)
 import           Data.Diceware            as DW
 import           Data.Store               (HasStore (..), Store (..))
 
