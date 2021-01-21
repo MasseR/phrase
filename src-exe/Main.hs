@@ -40,7 +40,7 @@ parseArgs =
     parseName :: Parser Text
     parseName = argument str (metavar "pass-name" <> help "Name of the secret")
     parseLength :: Parser Int
-    parseLength = argument auto (metavar "pass-size" <> help "Sentence size" <> value 3 <> showDefault)
+    parseLength = argument auto (metavar "pass-size" <> help "Sentence size" <> value 5 <> showDefault)
 
 main :: IO ()
 main = do
