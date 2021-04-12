@@ -5,7 +5,7 @@ import           Test.Hspec
 
 import           Data.Diceware
 
-import Data.Attoparsec.Text (parseOnly)
+import           Data.Attoparsec.Text (parseOnly)
 
 spec :: Spec
 spec =

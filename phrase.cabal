@@ -29,6 +29,7 @@ library
                      , Control.Phrase
                      , Data.Environment
                      , Data.Store
+                     , Data.Obfuscate
   build-depends:
                      , mtl
                      , text

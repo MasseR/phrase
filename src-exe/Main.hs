@@ -22,13 +22,15 @@ import           System.FilePath     ((</>))
 
 import           Data.Maybe          (fromMaybe)
 
+import           Data.Bool           (bool)
+import           Data.Obfuscate      (Obfuscate (..))
+
 import           Control.Monad.Trans (liftIO)
 
-
-
 data Args
-  = Args { argsName   :: Text
-         , argsLength :: Int
+  = Args { argsName      :: Text
+         , argsLength    :: Int
+         , argsObfuscate :: Obfuscate
          }
   deriving Show
 
@@ -36,11 +38,14 @@ parseArgs :: Parser Args
 parseArgs =
   Args <$> parseName
        <*> parseLength
+       <*> parseObfuscate
   where
     parseName :: Parser Text
     parseName = argument str (metavar "pass-name" <> help "Name of the secret")
     parseLength :: Parser Int
     parseLength = argument auto (metavar "pass-size" <> help "Sentence size" <> value 5 <> showDefault)
+    parseObfuscate :: Parser Obfuscate
+    parseObfuscate = bool NoObfuscation Obfuscate <$> switch (long "obfuscate" <> help "Switch some characters with their symbols")
 
 main :: IO ()
 main = do
@@ -50,7 +55,7 @@ main = do
   source <- getDataFileName "data/words"
   withEnv source storeDir $ \env ->
     runAppM env $ do
-      s <- Phrase.generateForName argsLength argsName
+      s <- Phrase.generateForName argsObfuscate argsLength argsName
       liftIO (either (const (T.putStrLn "File already exists")) T.putStrLn s)
   where
     opts :: ParserInfo Args

@@ -5,6 +5,8 @@ import qualified Control.Monad.Diceware   as DW
 import qualified Control.Monad.GnuPG      as GPG
 import           Data.Store
 
+import           Data.Obfuscate           (Obfuscate)
+
 import           Control.Monad.Except     (ExceptT (..), runExceptT, throwError)
 import           Control.Monad.IO.Unlift  (MonadUnliftIO)
 import           Control.Monad.Reader     (MonadReader)
@@ -46,19 +48,21 @@ encryptFile path content = runExceptT $ do
 
 generate
   :: (MonadUnliftIO m, MonadRandom m, MonadReader r m, GPG.HasRecipient r, DW.HasDiceware r)
-  => Int
+  => Obfuscate
+  -> Int
   -> FilePath
   -> m (Either FileExists Text)
-generate n path = runExceptT $ do
-  sentence <- lift (DW.randomSentence n)
+generate obf n path = runExceptT $ do
+  sentence <- lift (DW.randomSentence obf n)
   ExceptT (encryptFile path (view (re utf8) sentence))
   pure sentence
 
 generateForName
   :: (MonadUnliftIO m, MonadRandom m, MonadReader r m, GPG.HasRecipient r, DW.HasDiceware r, HasStore r)
-  => Int
+  => Obfuscate
+  -> Int
   -> Text
   -> m (Either FileExists Text)
-generateForName n name = do
+generateForName obf n name = do
   s <- view store
-  generate n (pathForName s name)
+  generate obf n (pathForName s name)
