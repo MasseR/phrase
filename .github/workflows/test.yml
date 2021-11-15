@@ -11,4 +11,4 @@ jobs:
     - run: nix build -I nixpkgs=channel:nixos-${{ matrix.env }} '(import <nixpkgs> {}).haskellPackages.callPackage ./. {}'
     strategy:
       matrix:
-        env: [19.09, unstable]
+        env: []
