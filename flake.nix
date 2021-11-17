@@ -2,18 +2,25 @@
   description = "phrase";
 
   inputs = {
-    easy-hls-src = { url = "github:jkachmar/easy-hls-nix"; };
+    easy-hls = { url = "github:jkachmar/easy-hls-nix"; };
     flake-utils = { url = "github:numtide/flake-utils"; };
   };
 
-  outputs = { self, nixpkgs, flake-utils, easy-hls-src }:
+  outputs = { self, nixpkgs, flake-utils, easy-hls }:
+    { overlay = final: prev: {
+        haskellPackages = prev.haskellPackages.override ( old: {
+          overrides = final.lib.composeExtensions (old.overrides or (_: _: {})) (f: p: {
+            phrase = f.callPackage ./. {};
+          });
+        });
+      };
+    }
+    //
     flake-utils.lib.eachSystem ["x86_64-linux" "x86_64-darwin"] ( system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
-        hp = pkgs.haskellPackages.extend (self: super: {
-            phrase = self.callPackage ./. {};
-          });
-        easy-hls = pkgs.callPackage easy-hls-src { ghcVersions = [ hp.ghc.version ]; };
+        pkgs = import nixpkgs { inherit system; overlays = [ self.overlay ]; };
+        hp = pkgs.haskellPackages;
+        hls = (easy-hls.withGhcs [ hp.ghc ]).${system};
       in
       rec {
 
@@ -33,7 +40,7 @@
             hp.hlint
             stylish-haskell
             ghcid
-            easy-hls
+            hls
           ];
         };
       }

@@ -1,6 +1,6 @@
 {
   "nodes": {
-    "easy-hls-src": {
+    "easy-hls": {
       "inputs": {
         "nixpkgs": "nixpkgs"
       },
@@ -64,7 +64,7 @@
     },
     "root": {
       "inputs": {
-        "easy-hls-src": "easy-hls-src",
+        "easy-hls": "easy-hls",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs_2"
       }
