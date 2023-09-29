@@ -22,6 +22,7 @@ common common-stanza
 
 library
   import:              common-stanza
+  other-modules:       Paths_phrase
   exposed-modules:     Data.Diceware
                      , Control.Monad.Diceware
                      , Control.Monad.GnuPG
@@ -30,23 +31,28 @@ library
                      , Data.Environment
                      , Data.Store
                      , Data.Obfuscate
+                     , Phrase
+                     , Command
   build-depends:
-                     , mtl
-                     , text
+                     , attoparsec
+                     , bytestring
                      , conduit
                      , conduit-extra
                      , containers
                      , cryptonite
-                     , transformers
-                     , attoparsec
-                     , lens
-                     , generic-lens
-                     , filepath
-                     , bytestring
-                     , unliftio-core
                      , directory
+                     , filepath
+                     , generic-lens
+                     , lens
+                     , mtl
+                     , optparse-applicative
+                     , resourcet
+                     , text
+                     , transformers
                      , unliftio
+                     , unliftio-core
   hs-source-dirs:      src
+  ghc-options:       -Wall
 
 test-suite test
   import:              common-stanza
@@ -63,17 +69,6 @@ executable phrase
   main-is:             Main.hs
   other-modules:       Paths_phrase
   -- other-extensions:
-  build-depends:       optparse-applicative
-                     , mtl
-                     , text
-                     , phrase
-                     , conduit
-                     , conduit-extra
-                     , resourcet
-                     , cryptonite
-                     , unliftio
-                     , unliftio-core
-                     , filepath
-                     , directory
+  build-depends:       phrase
   hs-source-dirs:      src-exe
   ghc-options:         -threaded -Wall

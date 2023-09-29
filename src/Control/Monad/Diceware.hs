@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE LambdaCase        #-}
 module Control.Monad.Diceware where
 
 import           Data.Diceware             (Diceware)
@@ -20,7 +19,6 @@ import           Data.Text                 (Text)
 import qualified Data.Text                 as T
 
 import           Control.Monad.Trans       (MonadIO, liftIO)
-import           Data.Tree                 (Forest, Tree (..))
 import           Data.Word                 (Word8)
 import           System.IO.Unsafe          (unsafeInterleaveIO)
 
