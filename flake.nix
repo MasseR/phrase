@@ -2,11 +2,10 @@
   description = "phrase";
 
   inputs = {
-    easy-hls = { url = "github:jkachmar/easy-hls-nix"; };
     flake-utils = { url = "github:numtide/flake-utils"; };
   };
 
-  outputs = { self, nixpkgs, flake-utils, easy-hls }:
+  outputs = { self, nixpkgs, flake-utils }:
     { overlay = final: prev: {
         haskellPackages = prev.haskellPackages.override ( old: {
           overrides = final.lib.composeExtensions (old.overrides or (_: _: {})) (f: p: {
@@ -20,7 +19,6 @@
       let
         pkgs = import nixpkgs { inherit system; overlays = [ self.overlay ]; };
         hp = pkgs.haskellPackages;
-        hls = (easy-hls.withGhcs [ hp.ghc ]).${system};
       in
       rec {
 
@@ -40,7 +38,7 @@
             hp.hlint
             stylish-haskell
             ghcid
-            hls
+            hp.haskell-language-server
           ];
         };
       }
