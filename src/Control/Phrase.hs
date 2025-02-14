@@ -27,18 +27,26 @@ import           Data.Text                (Text)
 import           Conduit                  (runConduit, runResourceT, yield,
                                            (.|))
 import           Data.Conduit.Combinators (sinkFile)
+import Control.Monad (when)
 
 data FileExists = FileExists
 
+data Force = Force | NoForce
+  deriving Show
+
 encryptFile
   :: (MonadUnliftIO m, MonadReader r m, GPG.HasRecipient r)
-  => FilePath
+  => Force
+  -> FilePath
   -> ByteString
   -> m (Either FileExists ())
-encryptFile path content = runExceptT $ do
+encryptFile force path content = runExceptT $ do
   r <- view GPG.recipient
   e <- liftIO (doesFileExist path)
-  if e then throwError FileExists else lift (encryptAndWrite r)
+  case force of
+    NoForce -> when e (throwError FileExists)
+    Force   -> return ()
+  lift (encryptAndWrite r)
   where
     encryptAndWrite r = do
       encrypted <- GPG.encrypt r (content <> "\n")
@@ -48,21 +56,23 @@ encryptFile path content = runExceptT $ do
 
 generate
   :: (MonadUnliftIO m, MonadRandom m, MonadReader r m, GPG.HasRecipient r, DW.HasDiceware r)
-  => Obfuscate
+  => Force
+  -> Obfuscate
   -> Int
   -> FilePath
   -> m (Either FileExists Text)
-generate obf n path = runExceptT $ do
+generate force obf n path = runExceptT $ do
   sentence <- lift (DW.randomSentence obf n)
-  ExceptT (encryptFile path (view (re utf8) sentence))
+  ExceptT (encryptFile force path (view (re utf8) sentence))
   pure sentence
 
 generateForName
   :: (MonadUnliftIO m, MonadRandom m, MonadReader r m, GPG.HasRecipient r, DW.HasDiceware r, HasStore r)
-  => Obfuscate
+  => Force
+  -> Obfuscate
   -> Int
   -> Text
   -> m (Either FileExists Text)
-generateForName obf n name = do
+generateForName force obf n name = do
   s <- view store
-  generate obf n (pathForName s name)
+  generate force obf n (pathForName s name)

@@ -33,7 +33,7 @@ defaultMain = do
   source <- getDataFileName "data/words"
   withEnv source storeDir $ \env ->
     runAppM env $ do
-      s <- Phrase.generateForName argsObfuscate argsLength argsName
+      s <- Phrase.generateForName argsForce argsObfuscate argsLength argsName
       liftIO (either (const (T.putStrLn "File already exists")) T.putStrLn s)
   where
     opts :: ParserInfo Args
